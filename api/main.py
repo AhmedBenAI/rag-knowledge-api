@@ -12,17 +12,19 @@ async def upload_pdf(user_id: str = Form(...), file: UploadFile = Form(...)):
     path = f"data/raw/{file.filename}"
     with open(path, "wb") as f:
         f.write(await file.read())
+
     docs = load_pdfs("data/raw")
     chunks = chunk_text(docs)
     embed_chunks(chunks, user_id)
-    return {"status": "uploaded"}
+
+    return {"status": "pdf indexed"}
 
 @app.post("/upload/url")
 def upload_url(user_id: str, url: str):
     doc = load_url(url)
     chunks = chunk_text([doc])
     embed_chunks(chunks, user_id)
-    return {"status": "url ingested"}
+    return {"status": "url indexed"}
 
 @app.post("/ask")
 def ask(user_id: str, question: str):

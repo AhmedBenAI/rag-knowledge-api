@@ -21,7 +21,12 @@ def load_pdfs(directory: str) -> List[Dict]:
 def load_url(url: str) -> Dict:
     r = requests.get(url, timeout=10)
     soup = BeautifulSoup(r.text, "html.parser")
+
     for tag in soup(["script", "style", "nav", "footer"]):
         tag.decompose()
+
     text = soup.get_text(separator=" ")
-    return {"text": text, "source": url}
+    return {
+        "text": text,
+        "source": url
+    }

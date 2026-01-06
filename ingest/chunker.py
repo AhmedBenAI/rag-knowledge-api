@@ -1,20 +1,28 @@
-import tiktoken
 from typing import List, Dict
+import math
 
-encoding = tiktoken.get_encoding("cl100k_base")
-
-def chunk_text(documents: List[Dict], chunk_size=500, overlap=100) -> List[Dict]:
+def chunk_text(
+    documents: List[Dict],
+    chunk_size: int = 500,
+    overlap: int = 100
+) -> List[Dict]:
     chunks = []
+
     for doc in documents:
-        tokens = encoding.encode(doc["text"])
+        words = doc["text"].split()
         start = 0
-        while start < len(tokens):
+
+        while start < len(words):
             end = start + chunk_size
-            chunk_tokens = tokens[start:end]
+            chunk_words = words[start:end]
+
             chunks.append({
-                "text": encoding.decode(chunk_tokens),
+                "text": " ".join(chunk_words),
                 "source": doc.get("source"),
-                "chunk_start": start
+                "page": doc.get("page"),
+                "start": start
             })
+
             start += chunk_size - overlap
+
     return chunks

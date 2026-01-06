@@ -1,25 +1,18 @@
-import os
 import faiss
 import pickle
-from openai import OpenAI
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
-client = OpenAI()
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def embed_chunks(chunks, user_id):
-    vectors = []
-    texts = []
-    for c in chunks:
-        res = client.embeddings.create(
-            model="text-embedding-3-small",
-            input=c["text"]
-        )
-        vectors.append(res.data[0].embedding)
-        texts.append(c)
+    texts = [c["text"] for c in chunks]
+    vectors = model.encode(texts, convert_to_numpy=True)
 
-    dim = len(vectors[0])
-    index = faiss.IndexFlatL2(dim)
-    index.add(np.array(vectors).astype("float32"))
+    index = faiss.IndexFlatL2(vectors.shape[1])
+    index.add(vectors)
 
     with open(f"data/processed/{user_id}_meta.pkl", "wb") as f:
-        pickle.dump(texts, f)
+        pickle.dump(chunks, f)
+
     faiss.write_index(index, f"data/processed/{user_id}.index")

@@ -1,17 +1,17 @@
-import faiss, pickle, numpy as np
-from openai import OpenAI
+import faiss
+import pickle
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
-client = OpenAI()
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def retrieve(question, user_id, k=5):
     index = faiss.read_index(f"data/processed/{user_id}.index")
+
     with open(f"data/processed/{user_id}_meta.pkl", "rb") as f:
         meta = pickle.load(f)
 
-    q_emb = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=question
-    ).data[0].embedding
+    q_vec = model.encode([question], convert_to_numpy=True)
+    _, I = index.search(q_vec, k)
 
-    D, I = index.search(np.array([q_emb]).astype("float32"), k)
     return [meta[i] for i in I[0]]
