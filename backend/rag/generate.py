@@ -1,26 +1,24 @@
-import requests
+import os
+from openai import OpenAI
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-def generate_answer(question, contexts):
-    context_text = "\n".join([c["text"] for c in contexts])
+SYSTEM_PROMPT = (
+    "You are a helpful assistant. "
+    "Answer the user's question using only the provided context. "
+    "If the answer is not in the context, say \"I do not know\"."
+)
 
-    prompt = f"""
-Use only the context below to answer.
-If the answer is not contained in the context, say "I do not know".
+def generate_answer(question: str, contexts: list[dict]) -> str:
+    context_text = "\n\n".join(c["text"] for c in contexts)
+    user_message = f"Context:\n{context_text}\n\nQuestion: {question}"
 
-Context:
-{context_text}
-
-Question:
-{question}
-"""
-
-    payload = {
-        "model": "phi3:mini",
-        "prompt": prompt,
-        "stream": False
-    }
-
-    r = requests.post(OLLAMA_URL, json=payload, timeout=60)
-    return r.json()["response"]
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        temperature=0,
+    )
+    return response.choices[0].message.content

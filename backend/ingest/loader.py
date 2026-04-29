@@ -4,18 +4,18 @@ from pypdf import PdfReader
 import requests
 from bs4 import BeautifulSoup
 
-def load_pdfs(directory: str) -> List[Dict]:
+def load_pdf(file_path: str) -> List[Dict]:
     documents = []
-    for pdf_path in Path(directory).glob("*.pdf"):
-        reader = PdfReader(pdf_path)
-        for page_num, page in enumerate(reader.pages):
-            text = page.extract_text()
-            if text:
-                documents.append({
-                    "text": text,
-                    "source": pdf_path.name,
-                    "page": page_num
-                })
+    path = Path(file_path)
+    reader = PdfReader(path)
+    for page_num, page in enumerate(reader.pages):
+        text = page.extract_text()
+        if text:
+            documents.append({
+                "text": text,
+                "source": path.name,
+                "page": page_num,
+            })
     return documents
 
 def load_url(url: str) -> Dict:
