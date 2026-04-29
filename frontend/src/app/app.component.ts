@@ -1,52 +1,47 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule, FormsModule, MatIconModule],
+  imports: [RouterModule, MatIconModule],
   template: `
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
           <div class="brand-icon-wrap">
-            <mat-icon>psychology</mat-icon>
+            <mat-icon>gavel</mat-icon>
           </div>
           <div class="brand-text">
-            <span class="brand-name">RAG Knowledge</span>
-            <span class="brand-tagline">AI Document Q&amp;A</span>
-          </div>
-        </div>
-
-        <div class="user-section">
-          <label class="input-label">Workspace / User ID</label>
-          <div class="user-input-wrap">
-            <mat-icon>person_outline</mat-icon>
-            <input
-              class="user-input"
-              [(ngModel)]="userId"
-              (ngModelChange)="saveUserId()"
-              placeholder="user_1"
-            />
+            <span class="brand-name">UK Law Assistant</span>
+            <span class="brand-tagline">Employment Law Q&amp;A</span>
           </div>
         </div>
 
         <nav class="sidebar-nav">
-          <a class="nav-item" routerLink="/upload" routerLinkActive="nav-active">
-            <mat-icon>upload_file</mat-icon>
-            <span>Knowledge Base</span>
-          </a>
           <a class="nav-item" routerLink="/chat" routerLinkActive="nav-active">
             <mat-icon>chat_bubble_outline</mat-icon>
-            <span>Ask AI</span>
+            <span>Ask a Question</span>
+          </a>
+          <a class="nav-item" routerLink="/upload" routerLinkActive="nav-active">
+            <mat-icon>upload_file</mat-icon>
+            <span>Add Documents</span>
           </a>
         </nav>
 
+        <div class="sidebar-sources">
+          <p class="sources-label">Knowledge base</p>
+          <ul>
+            <li>GOV.UK employment rights</li>
+            <li>ACAS guidelines</li>
+            <li>Your uploaded documents</li>
+          </ul>
+        </div>
+
         <div class="sidebar-footer">
-          <mat-icon>auto_awesome</mat-icon>
-          <span>Powered by GPT-3.5</span>
+          <mat-icon>info_outline</mat-icon>
+          <span>Not legal advice</span>
         </div>
       </aside>
 
@@ -63,9 +58,9 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .sidebar {
-      width: 260px;
-      min-width: 260px;
-      background: #1e1f2e;
+      width: 240px;
+      min-width: 240px;
+      background: #1a2332;
       color: #e0e0e0;
       display: flex;
       flex-direction: column;
@@ -82,7 +77,7 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .brand-icon-wrap {
-      background: #5c6bc0;
+      background: #c0392b;
       border-radius: 10px;
       padding: 8px;
       display: flex;
@@ -114,58 +109,8 @@ import { MatIconModule } from '@angular/material/icon';
       color: rgba(255,255,255,.4);
     }
 
-    .user-section {
-      padding: 20px 16px 8px;
-    }
-
-    .input-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      color: rgba(255,255,255,.35);
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .user-input-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 8px;
-      padding: 9px 12px;
-      transition: border-color .15s;
-    }
-
-    .user-input-wrap:focus-within {
-      border-color: rgba(92,107,192,.7);
-    }
-
-    .user-input-wrap mat-icon {
-      color: rgba(255,255,255,.4);
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .user-input {
-      background: none;
-      border: none;
-      outline: none;
-      color: rgba(255,255,255,.87);
-      font-size: 14px;
-      width: 100%;
-      font-family: inherit;
-    }
-
-    .user-input::placeholder {
-      color: rgba(255,255,255,.28);
-    }
-
     .sidebar-nav {
-      flex: 1;
-      padding: 12px 12px 0;
+      padding: 16px 12px 0;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -196,12 +141,31 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .nav-item.nav-active {
-      background: rgba(92,107,192,.25);
-      color: #9fa8da;
+      background: rgba(192,57,43,.25);
+      color: #e88;
     }
 
-    .nav-item.nav-active mat-icon {
-      color: #9fa8da;
+    .nav-item.nav-active mat-icon { color: #e88; }
+
+    .sidebar-sources {
+      flex: 1;
+      padding: 20px 20px 0;
+    }
+
+    .sources-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: rgba(255,255,255,.3);
+      margin: 0 0 8px;
+    }
+
+    .sidebar-sources ul {
+      margin: 0;
+      padding: 0 0 0 14px;
+      color: rgba(255,255,255,.45);
+      font-size: 12px;
+      line-height: 1.9;
     }
 
     .sidebar-footer {
@@ -227,15 +191,4 @@ import { MatIconModule } from '@angular/material/icon';
     }
   `],
 })
-export class AppComponent implements OnInit {
-  userId = 'user_1';
-
-  ngOnInit(): void {
-    const saved = localStorage.getItem('rag_user_id');
-    if (saved) this.userId = saved;
-  }
-
-  saveUserId(): void {
-    localStorage.setItem('rag_user_id', this.userId);
-  }
-}
+export class AppComponent {}

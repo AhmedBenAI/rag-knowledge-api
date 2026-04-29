@@ -17,6 +17,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiService } from '../../services/api.service';
 import { Message } from '../../models/types';
 
+const EXAMPLE_QUESTIONS = [
+  'Can my employer change my contract without my consent?',
+  'How much notice am I entitled to when made redundant?',
+  'What counts as unfair dismissal?',
+  'Am I entitled to paid holiday if I work part-time?',
+];
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -35,11 +42,11 @@ import { Message } from '../../models/types';
       <!-- Header -->
       <div class="chat-header">
         <div class="header-icon">
-          <mat-icon>smart_toy</mat-icon>
+          <mat-icon>gavel</mat-icon>
         </div>
         <div>
-          <h2>Ask AI</h2>
-          <span class="subheading">Answers grounded in your knowledge base</span>
+          <h2>Ask a Question</h2>
+          <span class="subheading">Answers grounded in GOV.UK &amp; ACAS guidance</span>
         </div>
         <button
           mat-stroked-button
@@ -47,16 +54,23 @@ import { Message } from '../../models/types';
           *ngIf="messages.length"
           (click)="clearChat()"
         >
-          <mat-icon>delete_sweep</mat-icon> Clear chat
+          <mat-icon>delete_sweep</mat-icon> Clear
         </button>
       </div>
 
       <!-- Messages -->
       <div class="messages" #messageList>
         <div *ngIf="messages.length === 0" class="empty-state">
-          <mat-icon>forum</mat-icon>
-          <h3>Ask anything</h3>
-          <p>Upload documents first, then ask questions about them.</p>
+          <mat-icon>balance</mat-icon>
+          <h3>UK employment law, explained clearly</h3>
+          <p>Try one of these common questions:</p>
+          <div class="example-questions">
+            <button
+              *ngFor="let q of examples"
+              class="example-btn"
+              (click)="askExample(q)"
+            >{{ q }}</button>
+          </div>
         </div>
 
         <div
@@ -65,7 +79,7 @@ import { Message } from '../../models/types';
           [class.user-row]="msg.role === 'user'"
         >
           <div class="avatar" *ngIf="msg.role === 'assistant'">
-            <mat-icon>smart_toy</mat-icon>
+            <mat-icon>gavel</mat-icon>
           </div>
 
           <div
@@ -91,11 +105,11 @@ import { Message } from '../../models/types';
         <!-- Loading indicator -->
         <div class="message-row" *ngIf="loading">
           <div class="avatar">
-            <mat-icon>smart_toy</mat-icon>
+            <mat-icon>gavel</mat-icon>
           </div>
           <div class="bubble assistant-bubble loading-bubble">
             <mat-spinner diameter="18"></mat-spinner>
-            <span>Thinking…</span>
+            <span>Researching…</span>
           </div>
         </div>
       </div>
@@ -106,7 +120,7 @@ import { Message } from '../../models/types';
           <input
             matInput
             [(ngModel)]="question"
-            placeholder="Ask a question about your documents…"
+            placeholder="Ask about your employment rights…"
             (keyup.enter)="send()"
             [disabled]="loading"
           />
@@ -142,7 +156,7 @@ import { Message } from '../../models/types';
     }
 
     .header-icon {
-      background: #ede7f6;
+      background: #fdecea;
       border-radius: 10px;
       padding: 10px;
       display: flex;
@@ -150,7 +164,7 @@ import { Message } from '../../models/types';
     }
 
     .header-icon mat-icon {
-      color: #5c6bc0;
+      color: #c0392b;
       font-size: 24px;
       width: 24px;
       height: 24px;
@@ -191,7 +205,7 @@ import { Message } from '../../models/types';
       justify-content: center;
       color: #bbb;
       text-align: center;
-      gap: 8px;
+      gap: 10px;
       padding-bottom: 60px;
     }
 
@@ -206,11 +220,40 @@ import { Message } from '../../models/types';
       margin: 0;
       font-weight: 500;
       color: #aaa;
+      font-size: 16px;
     }
 
     .empty-state p {
       margin: 0;
-      font-size: 14px;
+      font-size: 13px;
+    }
+
+    .example-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .example-btn {
+      background: #fff;
+      border: 1px solid #e0e0e8;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #444;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color .15s, background .15s;
+      font-family: inherit;
+    }
+
+    .example-btn:hover {
+      border-color: #c0392b;
+      background: #fdecea;
+      color: #c0392b;
     }
 
     .message-row {
@@ -225,7 +268,7 @@ import { Message } from '../../models/types';
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: #ede7f6;
+      background: #fdecea;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -236,7 +279,7 @@ import { Message } from '../../models/types';
       font-size: 18px;
       width: 18px;
       height: 18px;
-      color: #5c6bc0;
+      color: #c0392b;
     }
 
     .user-avatar { background: #e3f2fd; }
@@ -244,7 +287,7 @@ import { Message } from '../../models/types';
 
     /* ─── Bubbles ─── */
     .bubble {
-      max-width: 66%;
+      max-width: 68%;
       border-radius: 14px;
       padding: 12px 16px;
     }
@@ -257,7 +300,7 @@ import { Message } from '../../models/types';
     }
 
     .user-bubble {
-      background: #5c6bc0;
+      background: #1a2332;
       color: #fff;
       border-bottom-right-radius: 4px;
     }
@@ -265,7 +308,7 @@ import { Message } from '../../models/types';
     .bubble-text {
       margin: 0;
       font-size: 14px;
-      line-height: 1.65;
+      line-height: 1.7;
       white-space: pre-wrap;
     }
 
@@ -316,20 +359,22 @@ export class ChatComponent implements AfterViewChecked {
   private readonly api = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
 
+  readonly examples = EXAMPLE_QUESTIONS;
   messages: Message[] = [];
   question = '';
   loading = false;
   private needsScroll = false;
-
-  private get userId(): string {
-    return localStorage.getItem('rag_user_id') ?? 'user_1';
-  }
 
   ngAfterViewChecked(): void {
     if (this.needsScroll) {
       this.scrollToBottom();
       this.needsScroll = false;
     }
+  }
+
+  askExample(q: string): void {
+    this.question = q;
+    this.send();
   }
 
   send(): void {
@@ -341,7 +386,7 @@ export class ChatComponent implements AfterViewChecked {
     this.loading = true;
     this.needsScroll = true;
 
-    this.api.ask(this.userId, q).subscribe({
+    this.api.ask(q).subscribe({
       next: (res) => {
         this.messages.push({
           role: 'assistant',

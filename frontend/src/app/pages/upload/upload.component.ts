@@ -26,8 +26,8 @@ import { ApiService } from '../../services/api.service';
   template: `
     <div class="page">
       <div class="page-header">
-        <h1>Knowledge Base</h1>
-        <p>Upload documents or scrape web pages to build your AI knowledge base.</p>
+        <h1>Add Documents</h1>
+        <p>Supplement the knowledge base with your own documents — upload an employment contract, offer letter, or any relevant correspondence.</p>
       </div>
 
       <div class="cards">
@@ -242,10 +242,6 @@ export class UploadComponent {
   uploadType: 'pdf' | 'url' | null = null;
   isDragOver = false;
 
-  private get userId(): string {
-    return localStorage.getItem('rag_user_id') ?? 'user_1';
-  }
-
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) this.selectedFile = input.files[0];
@@ -276,7 +272,7 @@ export class UploadComponent {
     this.uploading = true;
     this.uploadType = 'pdf';
 
-    this.api.uploadPdf(this.userId, this.selectedFile).subscribe({
+    this.api.uploadPdf(this.selectedFile).subscribe({
       next: (res) => {
         this.snackBar.open(
           `Indexed "${res.source}" — ${res.chunks} chunks`,
@@ -304,7 +300,7 @@ export class UploadComponent {
     this.uploading = true;
     this.uploadType = 'url';
 
-    this.api.uploadUrl(this.userId, this.url).subscribe({
+    this.api.uploadUrl(this.url).subscribe({
       next: (res) => {
         this.snackBar.open(
           `Indexed "${res.source}" — ${res.chunks} chunks`,

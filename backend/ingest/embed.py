@@ -15,8 +15,18 @@ def embed_chunks(chunks: list[dict], user_id: str) -> None:
     texts = [c["text"] for c in chunks]
     vectors = model.encode(texts, convert_to_numpy=True)
 
-    index = faiss.IndexFlatL2(vectors.shape[1])
-    index.add(vectors)
+    index_path = PROCESSED_DIR / f"{user_id}.index"
+    meta_path = PROCESSED_DIR / f"{user_id}_meta.pkl"
 
-    (PROCESSED_DIR / f"{user_id}_meta.pkl").write_bytes(pickle.dumps(chunks))
-    faiss.write_index(index, str(PROCESSED_DIR / f"{user_id}.index"))
+    if index_path.exists() and meta_path.exists():
+        index = faiss.read_index(str(index_path))
+        existing_meta: list[dict] = pickle.loads(meta_path.read_bytes())
+        index.add(vectors)
+        combined_meta = existing_meta + chunks
+    else:
+        index = faiss.IndexFlatL2(vectors.shape[1])
+        index.add(vectors)
+        combined_meta = chunks
+
+    meta_path.write_bytes(pickle.dumps(combined_meta))
+    faiss.write_index(index, str(index_path))
