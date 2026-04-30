@@ -3,6 +3,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 load_dotenv(find_dotenv(raise_error_if_not_found=False))
@@ -18,7 +19,15 @@ PROCESSED_DIR = Path("data/processed")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-app = FastAPI(title="RAG Knowledge API", version="1.0.0")
+app = FastAPI(title="UK Employment Law API", version="1.0.0")
+
+_origins = os.getenv("CORS_ORIGINS", "*")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins.split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class UrlRequest(BaseModel):
