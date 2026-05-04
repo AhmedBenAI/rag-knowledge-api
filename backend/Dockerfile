@@ -16,6 +16,7 @@ RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTr
 COPY api/    ./api/
 COPY rag/    ./rag/
 COPY ingest/ ./ingest/
+COPY seed.py .
 
 RUN mkdir -p data/raw data/processed
 

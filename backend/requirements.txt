@@ -1,5 +1,6 @@
 fastapi
 uvicorn[standard]
+python-multipart
 faiss-cpu
 pypdf
 openai
@@ -7,3 +8,4 @@ python-dotenv
 beautifulsoup4
 sentence-transformers
 numpy
+requests
