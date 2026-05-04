@@ -22,4 +22,5 @@ RUN mkdir -p data/raw data/processed
 
 EXPOSE 8000
 
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD python seed.py && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+
