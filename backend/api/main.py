@@ -1,8 +1,9 @@
+import logging
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv, find_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,6 +20,20 @@ PROCESSED_DIR = Path("data/processed")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
+logger = logging.getLogger("visits")
+logging.basicConfig(level=logging.INFO)
+
+BOT_MARKERS = (
+    "bot", "spider", "crawl", "gptbot", "ccbot", "claudebot", "anthropic",
+    "python-requests", "curl", "wget", "scrapy", "headlesschrome", "phantomjs",
+)
+
+
+def guess_is_bot(user_agent: str) -> bool:
+    ua = user_agent.lower()
+    return not ua or any(marker in ua for marker in BOT_MARKERS)
+
+
 app = FastAPI(title="UK Employment Law API", version="1.0.0")
 
 _origins = os.getenv("CORS_ORIGINS", "*")
@@ -28,6 +43,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_visits(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path != "/health":
+        user_agent = request.headers.get("user-agent", "")
+        referer = request.headers.get("referer", "-")
+        client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "-")
+        logger.info(
+            "visit ip=%s path=%s referer=%s bot=%s ua=%s",
+            client_ip, request.url.path, referer, guess_is_bot(user_agent), user_agent,
+        )
+    return response
 
 
 class UrlRequest(BaseModel):

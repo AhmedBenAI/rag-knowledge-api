@@ -3,9 +3,9 @@ import pickle
 
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+from ingest.model import model
+
 PROCESSED_DIR = Path("data/processed")
 
 
